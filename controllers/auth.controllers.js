@@ -3,14 +3,6 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const passport = require("passport"); 
 
-// const users = []; // store the user info here
-
-// const initializePassport = require("../config/passport");
-// initializePassport(
-//   passport, 
-//   email => users.find(user => user.email === email),
-//   id => users.find(user => user.id === id)
-//   );
 
 const getLogin = async (req, res) => {
   const filePath = path.join(__dirname, "..", "views", "login.html");
@@ -19,7 +11,7 @@ const getLogin = async (req, res) => {
 
 const postLogin = (req, res, next) => {
   passport.authenticate("local", {
-    successRedirect: "/media-pages",
+    successRedirect: "/homePage",
     failureRedirect: "/login",
     failureFlash: true,
   })(req, res, next);
@@ -32,22 +24,7 @@ const getRegister = async (req, res) => {
 };
 
 const postRegister = async (req, res, next) => {
-  // try {
-  //   const hashedPassword = await bcrypt.hash(req.body.password, 10); // req.body.password ==> password should be exact match to register.html name=password,  10:how many time you want to generate hash. it's a standard default value
-  //   users.push({
-  //     id: Date.now().toString(),
-  //     name: req.body.username ,
-  //     email: req.body.email,
-  //     password: hashedPassword,
-  //   });
-
-  //   res.redirect("/login");
-  // } catch{
-  //   res.redirect("/register");
-  // }
-  // console.log(users); // show the user list
-
-  const {  email, password } = req.body;
+const { email, password } = req.body;
 const name= req.body.name
 
   console.log(name)
@@ -100,6 +77,7 @@ if (errors.length > 0) {
   });
 }
 };
+
 const getProfileInfos = async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -109,9 +87,14 @@ const getProfileInfos = async (req, res) => {
   }
 };
 
-const updateProfile = async (req, res) => {
+const getResetPassword = async (req, res) => {
+  const filePath = path.join(__dirname, "..", "views", "resetPassword.html");
+  res.sendFile(filePath);
+};
+
+const postResetPassword = async (req, res) => {
   try {
-    const { name, currentPassword, newPassword, hobby, profession  } = req.body;
+    const { name, currentPassword, newPassword, email  } = req.body;
     console.log(newPassword)
     
     const userId = req.user.id
@@ -119,8 +102,6 @@ const updateProfile = async (req, res) => {
     console.log(user)
 
 
-
-    // Update the password if provided
     if (newPassword) {
       const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
 
@@ -132,19 +113,14 @@ const updateProfile = async (req, res) => {
       user.password = hashedPassword;
     }
 
-    // Update the designation if provided
-    if (hobby) {
-      user.hobby = hobby;
-    }
 
-
-    if (profession) {
-      user.profession = profession
+    if (email) {
+      user.email = email
     }
 
     await user.save();
 
-    res.json({ message: 'User information updated successfully' });
+    res.redirect("/homePage");
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }
@@ -167,10 +143,10 @@ const deleteProfile = async (req, res) => {
   }
 };
 
-// const getMediaPage = async (req, res) => {
-//   const filePath = path.join(__dirname, "..", "views", "mediaFiles.html");
-//   res.sendFile(filePath);
-// };
+const getHomePage = async (req, res) => {
+const filePath = path.join(__dirname, "..", "views", "homePage.html");
+res.sendFile(filePath);
+};
 
 const postProfileImage = async (req, res) => {
   try {
@@ -235,8 +211,8 @@ const postAudioFile = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: 'No file provided' });
     }
-const audio = req.file.filename
-    
+
+    const audio = req.file.filename
     const userId = req.user.id
     const user = await User.findById(userId);
     console.log(user)
@@ -259,11 +235,13 @@ module.exports = {
   postLogin,
   postRegister,
   getProfileInfos,
-  updateProfile,
   deleteProfile,
   postProfileImage,
   postMultipleImages,
   getMultipleImages,
-  postAudioFile
+  postAudioFile,
+  getHomePage,
+  getResetPassword,
+  postResetPassword
 };
 

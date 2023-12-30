@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const bodyParser = require("body-parser"); // parse the body of HTTP request
 const cookieParser = require("cookie-parser"); //parse cookies that are sent with HTTP request
 const session = require("express-session");
@@ -23,7 +24,6 @@ app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
 const cors = require("cors");   //Cross-origin resource sharing (CORS) is a browser mechanism which
                                   //  enables controlled access to resources located outside of a given domain.
 app.use(cookieParser());
@@ -39,7 +39,7 @@ const routes1 = require("./routes/todo.routes");
 app.use(routes1);
 
 const ensureAuthenticated = require("./middlewares/auth.middleware");
-app.get("/welcome", ensureAuthenticated, (req, res) => {
+app.get("/homePage", ensureAuthenticated, (req, res) => {
   res.sendFile(__dirname + "/views/homePage.html");
 });
 

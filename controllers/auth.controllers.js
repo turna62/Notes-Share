@@ -128,7 +128,7 @@ const postResetPassword = async (req, res) => {
 
 const deleteProfile = async (req, res) => {
   try {
-    const profileID = req.params.id;
+    const profileID = req.user.id;
     const profileInfo = await User.findById(profileID);
 
     if (!profileInfo) {
@@ -137,7 +137,7 @@ const deleteProfile = async (req, res) => {
 
     await profileInfo.deleteOne({ _id: profileID });
 
-    res.json({ message: "Profile information deleted successfully" });
+    res.redirect("/register");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

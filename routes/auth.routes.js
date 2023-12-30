@@ -31,8 +31,8 @@ router.get("/logout", (req, res) => {
 router.get("/profiles", getProfileInfos);
 router.get("/reset-password", getResetPassword);
 router.post("/reset-password",  postResetPassword);
-router.delete("/delete-profile/:id", deleteProfile);
-
+router.get("/delete-profile", deleteProfile);
+router.delete("/delete-profile", deleteProfile);
  
 // upload images
 const {uploadProfileImage, uploadAudioFile} = require("../middlewares/image.middleware")
